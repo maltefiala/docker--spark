@@ -1,0 +1,22 @@
+version: '2'
+services:
+
+  spark-master:
+    build: .
+    image: produktion/spark
+    ports:
+      - 7077:7077
+      - 8080:8080
+      - 6066:6066
+    command: ["/spark/bin/spark-class", "org.apache.spark.deploy.master.Master"]
+
+  spark-worker:
+    build: .
+    image: produktion/spark
+    volumes:
+      - ~/dockervolumes/spark/worker:/scratch
+    environment:
+      - SPARK_WORKER_DIR=/scratch
+    command: ["/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
+    depends_on:
+      - spark-master
